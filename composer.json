@@ -1,0 +1,9 @@
+{
+    "name": "ruckuus/rtlmtr",
+    "type": "system",
+    "description": "RtLmtr",
+    "autoload": {
+        "psr-0": {"RtLmtr": "lib"}
+    },
+    "minimum-stability": "dev"
+}

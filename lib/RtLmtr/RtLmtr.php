@@ -2,8 +2,14 @@
 namespace RtLmtr;
 
 class RtLmtr {
+
     protected $redis; // Redis object instance
+
     public function __construct(array $config = array()) {
+        if (!class_exists('Redis')) {
+          throw new \Exception('Please enable Redis extension!');
+        }
+
         $this->redis = new \Redis();
         $this->redis->connect($config["host"], $config["port"]);
         if (isset($config['auth']))  $this->redis->auth($config["auth"]);

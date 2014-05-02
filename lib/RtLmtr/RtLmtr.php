@@ -3,7 +3,7 @@ namespace RtLmtr;
 
 class RtLmtr {
 
-    protected $redis; // Redis object instance
+    protected $redis;
 
     public function __construct(array $config = array()) {
         if (!class_exists('Redis')) {
@@ -16,27 +16,23 @@ class RtLmtr {
     }
 
     public function rateLimitSimple($hash, $expire) {
-        $hash = "smpl_" . $hash;
         $current = $this->redis->get($hash);
-        if (FALSE === $current) {
+        if (false === $current) {
             $this->redis->incr($hash);
-            $this->redis->expire($hash, intval($expire));
-            return 0;
+            return $this->redis->expire($hash, intval($expire));
         }
-        return 1;
+        return false;
     }
 
     public function rateLimitCounter($hash, $max, $expire) {
-        $hash = "cntr_" . $hash;
         $current = $this->redis->get($hash);
-        if (($current != NULL) && ($current > $max)) {
+        if (($current != NULL) && ($current >= $max)) {
             return 1;
         } else {
             $this->redis->incr($hash);
-            $this->redis->expire($hash, intval($expire));
-            return 0;
+            return $this->redis->expire($hash, intval($expire));
         }
-        return 1;
+        return false;
     }
 }
 

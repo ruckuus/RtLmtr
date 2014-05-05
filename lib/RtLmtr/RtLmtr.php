@@ -1,38 +1,37 @@
 <?php
+
 namespace RtLmtr;
+
+use RtLmtr\Interfaces\DriverInterface;
 
 class RtLmtr {
 
-    protected $redis;
+    protected $driver;
 
-    public function __construct(array $config = array()) {
-        if (!class_exists('Redis')) {
-          throw new \Exception('Please enable Redis extension!');
-        }
-
-        $this->redis = new \Redis();
-        $this->redis->connect($config["host"], $config["port"]);
-        if (isset($config['auth']))  $this->redis->auth($config["auth"]);
+    public function __construct(DriverInterface $driver) {
+        $this->driver = $driver;
     }
 
     public function rateLimitSimple($hash, $expire) {
-        $current = $this->redis->get($hash);
+        $current = $this->driver->get($hash);
         if (false === $current) {
-            $this->redis->incr($hash);
-            return $this->redis->expire($hash, intval($expire));
+            return $this->driver->incr($hash, $expire);
         }
         return false;
     }
 
     public function rateLimitCounter($hash, $max, $expire) {
-        $current = $this->redis->get($hash);
+        $current = $this->driver->get($hash);
         if (($current != NULL) && ($current >= $max)) {
-            return 1;
+            return false;
         } else {
-            $this->redis->incr($hash);
-            return $this->redis->expire($hash, intval($expire));
+            return $this->driver->incr($hash, $expire);
         }
         return false;
     }
+
+    public function get($hash) {
+      return $this->driver->get($hash);
+    } 
 }
 

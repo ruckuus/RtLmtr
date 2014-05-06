@@ -9,6 +9,7 @@ $config = array(
 
 $driver = new RtLmtr\Drivers\Redis($config);
 $lmtr = new RtLmtr\RtLmtr($driver);
+var_dump($lmtr);
 
 $id1 = 123123;
 $id2 = 234234;
@@ -17,6 +18,8 @@ $string = sprintf("%s%s", sha1($id1), sha1($id2));
 
 $rv = $lmtr->rateLimitSimple($string, 300);
 $rv = $lmtr->rateLimitCounter("cntr" . $string, 10, 300);
+
+var_dump($rv);
 
 /*
 echo $string . "\n";

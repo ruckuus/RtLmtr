@@ -18,9 +18,10 @@ class Redis implements DriverInterface
   }
 
   public function set($key, $value, $expiry = null) {
-    $this->redis->set($key, $value);
-    if (null != $expiry) {
-      $this->redis->expire($key, intval($exp));
+    if (null === $expiry) {
+      return $this->redis->set($key, $value);
+    } else {
+      return $this->redis->setex($key, intval($expiry), $value);
     }
   }
 
@@ -29,10 +30,15 @@ class Redis implements DriverInterface
   }
 
   public function incr($key, $expiry = null) {
-    $this->redis->incr($key);
+    $val = $this->redis->incr($key);
     if (null != $expiry) {
       $this->redis->expire($key, intval($expiry));
     }
+    return $val;
+  }
+
+  public function expire($key, $expiry) {
+    return $this->redis->expire($key, intval($expiry));
   }
 
 }

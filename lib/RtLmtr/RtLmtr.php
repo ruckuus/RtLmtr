@@ -12,26 +12,30 @@ class RtLmtr {
         $this->driver = $driver;
     }
 
-    public function rateLimitSimple($hash, $expire) {
-        $current = $this->driver->get($hash);
+    public function rateLimitSimple($key, $expire) {
+        $current = $this->driver->get($key);
         if (false === $current) {
-            return $this->driver->incr($hash, $expire);
+            return $this->driver->incr($key, $expire);
         }
         return false;
     }
 
-    public function rateLimitCounter($hash, $max, $expire) {
-        $current = $this->driver->get($hash);
-        if (($current != NULL) && ($current >= $max)) {
+    public function rateLimitCounter($key, $max, $expire) {
+        $current = $this->driver->get($key);
+        if (($current != false) && ($current >= $max)) {
             return false;
         } else {
-            return $this->driver->incr($hash, $expire);
+          if ($current == false) {
+            return (false !== $this->driver->incr($key, $expire));
+          } else {
+            return (false !== $this->driver->incr($key, null));
+          }
         }
         return false;
     }
 
-    public function get($hash) {
-      return $this->driver->get($hash);
+    public function get($key) {
+      return $this->driver->get($key);
     } 
 }
 
